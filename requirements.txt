@@ -1,0 +1,47 @@
+import requests
+import json
+import time
+from openpyxl import Workbook
+wb=Workbook()
+ws=wb.active
+ws1=wb.create_sheet("sheet2")
+ws['A1']="CityNames"
+ws['B1']="Unit"
+ws['C1']="Temperature"
+ws["D1"]="Humdity"
+ws["E1"]="update"
+city=["parvathipuram","hyderabad","chennai"]
+for i in range(len(city)):
+    r="http://api.openweathermap.org/data/2.5/weather?APPID=6c23f0e2a44cb639249085d36e566cf7&q="
+    url=r+city[i]
+    data=requests.get(url).json()
+    unit=input("Enter unit of temperature c/f")
+    update=int(input("Enter value of update 0/1"))
+    temp=data["main"]["temp"]
+    humidity=data["main"]["humidity"]
+    ws.cell(row=i+2,column=1).value=city[i]
+    ws.cell(row=i+2,column=2).value=unit
+    if unit=="c":
+        temp1=temp-273.15
+        ws.cell(row=i+2,column=3).value=temp1
+    elif unit=="f":
+        temp2=((temp-273.15)*9/5)+32
+        ws.cell(row=i+2,column=3).value=temp2
+    ws.cell(row=i+2,column=4).value=humidity
+    if update==1:
+        ws.cell(row=i+2,column=5).value=1
+        ws.cell(row=i+2,column=1).value=city[i]
+        ws.cell(row=i+2,column=2).value=unit
+        if unit=="c":
+            temp1=temp-273.15
+            ws.cell(row=i+2,column=3).value=temp1
+        elif unit=="f":
+            temp2=((temp-273.15)*9/5)+32
+            ws.cell(row=i+2,column=3).value=temp2
+        ws.cell(row=i+2,column=4).value=humidity
+    elif update==0:
+        ws.cell(row=i+2,column=5).value=0
+ws1['A1']="CityNames"
+for i in range(len(city)):
+    ws1.cell(row=i+2,column=1).value=city[i]
+wb.save("out.xlsx")
